@@ -10,12 +10,14 @@ A ROS 2 Humble project demonstrating custom interfaces, action servers, services
 
 ## Packages
 
-### turtle_interfaces
-- TargetPose.msg: Target position and orientation.
-- GoToPose.action: Turtle movement action.
-- SetSpeedLimits.srv: Runtime speed-limit configuration.
+### `turtle_interfaces`
 
-### turtle_control
+- `TargetPose.msg`: Target position and orientation.
+- `GoToPose.action`: Turtle movement action.
+- `SetSpeedLimits.srv`: Runtime speed-limit configuration.
+
+### `turtle_control`
+
 - GoToPose action server.
 - Turtle reset service.
 - Square drawing action server.
@@ -30,34 +32,62 @@ A ROS 2 Humble project demonstrating custom interfaces, action servers, services
 
 ## Build
 
-    source /opt/ros/humble/setup.bash
-    cd ~/ros2_ws
-    colcon build --packages-up-to turtle_control
-    source ~/ros2_ws/install/setup.bash
+```bash
+source /opt/ros/humble/setup.bash
+cd ~/ros2_ws
+colcon build --packages-up-to turtle_control
+source ~/ros2_ws/install/setup.bash
+```
 
 ## Launch
 
-    ros2 launch turtle_control turtle_system.launch.py
+```bash
+ros2 launch turtle_control turtle_system.launch.py
+```
 
 ## Reset the Turtle
 
-    ros2 service call /reset_turtle std_srvs/srv/Empty "{}"
+```bash
+ros2 service call /reset_turtle std_srvs/srv/Empty "{}"
+```
 
 ## Change Speed Limits
 
-    ros2 service call /set_speed_limits turtle_interfaces/srv/SetSpeedLimits "{max_linear_speed: 1.0, max_angular_speed: 1.5}"
+```bash
+ros2 service call /set_speed_limits turtle_interfaces/srv/SetSpeedLimits "{max_linear_speed: 1.0, max_angular_speed: 1.5}"
+```
 
 ## Move to a Target Pose
 
-    ros2 action send_goal /go_to_pose turtle_interfaces/action/GoToPose "{target: {x: 7.0, y: 7.0, yaw: 0.0}}" --feedback
+```bash
+ros2 action send_goal /go_to_pose turtle_interfaces/action/GoToPose "{target: {x: 7.0, y: 7.0, yaw: 0.0}}" --feedback
+```
 
 ## Draw a Square
 
-    ros2 action send_goal /draw_square turtle_interfaces/action/GoToPose "{}" --feedback
+Verify the action type with `ros2 action list -t` before using the command below.
+
+```bash
+ros2 action send_goal /draw_square <ACTION_TYPE> "{}" --feedback
+```
+
+Replace `<ACTION_TYPE>` with the actual action type reported for `/draw_square`.
 
 ## Rosbag
 
-The project was tested with rosbag recording and playback using:
+The relevant topics for recording and playback are:
 
-- /turtle1/cmd_vel
-- /turtle1/pose
+- `/turtle1/cmd_vel`
+- `/turtle1/pose`
+
+Record these topics with:
+
+```bash
+ros2 bag record /turtle1/cmd_vel /turtle1/pose
+```
+
+Replay a recording with:
+
+```bash
+ros2 bag play <bag_directory>
+```
