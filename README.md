@@ -1,6 +1,6 @@
 # ROS 2 Turtlesim Assignment
 
-A ROS 2 Humble project demonstrating custom interfaces, action servers, services, turtle movement control, square drawing, and rosbag recording/playback.
+A ROS 2 Humble project that demonstrates custom ROS interfaces, action servers, services, turtle pose control, square drawing, and runtime speed configuration.
 
 ## Team Members
 
@@ -8,20 +8,25 @@ A ROS 2 Humble project demonstrating custom interfaces, action servers, services
 - Abdullah Haitham — ID: 9678
 - Yahia Mostafa — ID: 9475
 
-## Packages
+## Project Structure
 
 ### `turtle_interfaces`
 
-- `TargetPose.msg`: Target position and orientation.
-- `GoToPose.action`: Turtle movement action.
-- `SetSpeedLimits.srv`: Runtime speed-limit configuration.
+Contains the custom ROS 2 interfaces used by the project:
+
+- `msg/TargetPose.msg` — Defines the target position (`x`, `y`) and orientation (`yaw`).
+- `action/GoToPose.action` — Defines the goal, result, and feedback for turtle movement.
+- `srv/SetSpeedLimits.srv` — Defines the service request and response for configuring speed limits.
 
 ### `turtle_control`
 
-- GoToPose action server.
-- Turtle reset service.
-- Square drawing action server.
-- Speed-limit service.
+Contains the Python nodes and launch file:
+
+- `go_to_pose_server.py` — Action server for moving the turtle to a target pose.
+- `square_action_server.py` — Action server for square drawing.
+- `reset_service.py` — Service for clearing the drawing and resetting the turtle.
+- `set_speed_service.py` — Service for changing speed limits.
+- `launch/turtle_system.launch.py` — Launches Turtlesim and the project nodes.
 
 ## Requirements
 
@@ -32,6 +37,8 @@ A ROS 2 Humble project demonstrating custom interfaces, action servers, services
 
 ## Build
 
+Open a terminal and run:
+
 ```bash
 source /opt/ros/humble/setup.bash
 cd ~/ros2_ws
@@ -39,55 +46,78 @@ colcon build --packages-up-to turtle_control
 source ~/ros2_ws/install/setup.bash
 ```
 
-## Launch
+## Launch the Project
+
+The launch file starts Turtlesim, both action servers, and the reset and speed-limit services.
 
 ```bash
 ros2 launch turtle_control turtle_system.launch.py
 ```
 
-## Reset the Turtle
+## Usage
+
+Run the following commands in a separate terminal after sourcing the ROS 2 and workspace environments:
 
 ```bash
-ros2 service call /reset_turtle std_srvs/srv/Empty "{}"
+source /opt/ros/humble/setup.bash
+source ~/ros2_ws/install/setup.bash
 ```
 
-## Change Speed Limits
+### Move to a Target Pose
 
-```bash
-ros2 service call /set_speed_limits turtle_interfaces/srv/SetSpeedLimits "{max_linear_speed: 1.0, max_angular_speed: 1.5}"
-```
-
-## Move to a Target Pose
+Send a target position and orientation to the `go_to_pose` action server:
 
 ```bash
 ros2 action send_goal /go_to_pose turtle_interfaces/action/GoToPose "{target: {x: 7.0, y: 7.0, yaw: 0.0}}" --feedback
 ```
 
-## Draw a Square
+The target coordinates are in the Turtlesim window, and `yaw` specifies the target orientation in radians.
 
-Verify the action type with `ros2 action list -t` before using the command below.
+### Draw a Square
+
+Send a goal to the square drawing action server:
 
 ```bash
-ros2 action send_goal /draw_square <ACTION_TYPE> "{}" --feedback
+ros2 action send_goal /draw_square turtle_interfaces/action/GoToPose "{}" --feedback
 ```
 
-Replace `<ACTION_TYPE>` with the actual action type reported for `/draw_square`.
+### Reset the Turtle
 
-## Rosbag
+Clear the drawing and request a reset to the initial pose:
 
-The relevant topics for recording and playback are:
+```bash
+ros2 service call /reset_turtle std_srvs/srv/Empty "{}"
+```
 
-- `/turtle1/cmd_vel`
-- `/turtle1/pose`
+### Change Speed Limits
 
-Record these topics with:
+Set the maximum linear and angular speeds:
+
+```bash
+ros2 service call /set_speed_limits turtle_interfaces/srv/SetSpeedLimits "{max_linear_speed: 1.0, max_angular_speed: 1.5}"
+```
+
+The values are examples; use positive values appropriate for your test.
+
+## Rosbag Recording and Playback
+
+ROS 2 bags can record and replay topic data for testing and analysis.
+
+To record turtle velocity commands and pose updates:
 
 ```bash
 ros2 bag record /turtle1/cmd_vel /turtle1/pose
 ```
 
-Replay a recording with:
+Stop recording with `Ctrl+C`. ROS 2 creates a bag directory in the current working directory.
+
+To replay a recording, replace `<bag_directory>` with the name of the directory created during recording:
 
 ```bash
 ros2 bag play <bag_directory>
 ```
+
+## Notes
+
+- Source the ROS 2 Humble environment and workspace setup file in each new terminal before running project commands.
+- The launch file configures the movement server with default maximum linear and angular speeds of `2.0`.
