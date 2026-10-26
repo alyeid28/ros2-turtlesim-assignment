@@ -7,6 +7,7 @@ A ROS 2 Humble project that demonstrates custom ROS interfaces, action servers, 
 - Aly Eid — ID: 9561
 - Abdullah Haitham — ID: 9678
 - Yahia Mostafa — ID: 9475
+- Mohamed Tarek — ID: 9607
 
 ## Project Structure
 
